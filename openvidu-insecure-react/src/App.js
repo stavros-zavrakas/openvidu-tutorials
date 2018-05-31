@@ -1,7 +1,38 @@
 import React, { Component, Fragment } from 'react';
+import { OpenVidu } from 'openvidu-browser';
 import './App.css';
 
 class App extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      sessionId: `Session ${Math.floor(Math.random() * 100)}`,
+      username: `Participant ${Math.floor(Math.random() * 100)}`
+    };
+
+    this.session = null;
+  }
+
+  bindWindowEvents() {
+    window.onbeforeunload = this.beforeUnload.bind(this);
+  }
+
+  beforeUnload() {
+    // Gracefully leave session
+    if (this.session) {
+        // removeUser();
+        // leaveSession();
+    }
+    // logOut();
+  }
+
+  handleChange(field, e) {
+    this.setState({
+      [field]: e.target.value
+    });
+  }
+
   renderVideoSession(session_title) {
     if (!session_title) {
       return null;
@@ -61,11 +92,11 @@ class App extends Component {
               <form className="form-group">
                 <p>
                   <label>Participant</label>
-                  <input className="form-control" type="text" id="userName" required />
+                  <input onChange={this.handleChange.bind(this, 'username')} className="form-control" type="text" value={this.state.username} required />
                 </p>
                 <p>
                   <label>Session</label>
-                  <input className="form-control" type="text" id="sessionId" required />
+                  <input onChange={this.handleChange.bind(this, 'sessionId')} className="form-control" type="text" value={this.state.sessionId} required />
                 </p>
                 <p className="text-center">
                   <input className="btn btn-lg btn-success" type="submit" name="commit" value="Join!" />
