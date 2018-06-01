@@ -13,12 +13,16 @@ class App extends Component {
     this.state = {
       isActiveSession: false,
       sessionName: `Session ${Math.floor(Math.random() * 100)}`,
-      username: `Participant ${Math.floor(Math.random() * 100)}`
+      username: `Participant ${Math.floor(Math.random() * 100)}`,
+      connections: {}
     };
 
     this.session = null
 
     this.bindWindowEvents();
+
+    this.initMainVideo.bind(this);
+    this.appendUserData.bind(this);
   }
 
   bindWindowEvents() {
@@ -55,12 +59,47 @@ class App extends Component {
     });
   }
 
-  initMainVideo() {
+  initMainVideo(videoElement) {
+    const videoDom = document.querySelector('#main-video video');
 
+    videoDom.srcObject = videoElement.srcObject;
+    videoDom.muted = 'muted';
   }
 
-  appendUserData() {
+  appendUserData(videoElement, connection) {
+    debugger;
+    var clientData = JSON.parse(connection.data.split('%/%')[0]).clientData;
+    var serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
+    var nodeId = connection.connectionId;
+    this.setState({
+      connections: {
+        [nodeId]: connection
+      }
+    });
+    
+    // var dataNode = document.createElement('div');
+    // dataNode.className = "data-node";
+    // dataNode.id = "data-" + nodeId;
+    // dataNode.innerHTML = "<p class='nickName'>" + clientData + "</p><p class='userName'>" + serverData + "</p>";
+    // videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
 
+    // var clientData;
+    // var serverData;
+    // var nodeId;
+    // if (connection.nickName) { // Appending local video data
+    //   clientData = connection.nickName;
+    //   serverData = connection.userName;
+    //   nodeId = 'main-videodata';
+    // } else {
+    //   clientData = JSON.parse(connection.data.split('%/%')[0]).clientData;
+    //   serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
+    //   nodeId = connection.connectionId;
+    // }
+    // var dataNode = document.createElement('div');
+    // dataNode.className = "data-node";
+    // dataNode.id = "data-" + nodeId;
+    // dataNode.innerHTML = "<p class='nickName'>" + clientData + "</p><p class='userName'>" + serverData + "</p>";
+    // videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
   }
 
   removeUserData() {
@@ -87,7 +126,7 @@ class App extends Component {
 
       // When the HTML video has been appended to DOM...
       subscriber.on('videoElementCreated', (event) => {
-
+        debugger;
         // Add a new HTML element for the user's name and nickname over its video
         this.appendUserData(event.element, subscriber.stream.connection);
       });
@@ -129,7 +168,6 @@ class App extends Component {
           };
           
           this.initMainVideo(event.element, userData);
-          this.appendUserData(event.element, userData);
 
           // @todo: select the element and mute the video
           // $(event.element).prop('muted', true); // Mute local video
@@ -188,7 +226,10 @@ class App extends Component {
           <h1 id="session-title">{sessionName}</h1>
           <input className="btn btn-large btn-danger" type="button" id="buttonLeaveSession" value="Leave session" />
         </div>
-        <div id="main-video" className="col-md-6"><p></p><video autoPlay></video></div>
+        <div id="main-video" className="col-md-6">
+          <p>{this.state.username}</p>
+          <video autoPlay></video>
+        </div>
         <div id="video-container" className="col-md-6"></div>
       </div>
     )

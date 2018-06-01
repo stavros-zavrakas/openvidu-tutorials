@@ -96,9 +96,7 @@ app.post('/api-sessions/get-token', function (req, res) {
     // Optional data to be passed to other users when this user connects to the video-call
     // In this case, a JSON with the value we stored in the req.session object on login
     var serverData = JSON.stringify({
-        serverData: {
-            username: username
-        }
+        serverData: username
     });
 
     console.log("Getting a token | {sessionName}={" + sessionName + "}");
